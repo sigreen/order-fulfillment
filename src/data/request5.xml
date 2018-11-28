@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<order type="request">
+  <itemName>Wrench</itemName>
+  <itemQty>8</itemQty>
+  <unitPrice>4.99</unitPrice>
+</order>
