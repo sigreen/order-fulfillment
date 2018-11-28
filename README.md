@@ -8,7 +8,7 @@ The Camel routes used in this example are explained by the following diagram:
 
 ![CBR Diagram](src/img/order_fullfilment.png)
 
-#### Prerequisite installation steps
+## Prerequisite installation steps
 
 ### Setup Fuse Online
 
@@ -64,7 +64,7 @@ The Camel routes used in this example are explained by the following diagram:
 
 1. Once the broker has started, navigate to Services and create a route for the `broker-amq-tcp-ssl` service.  Ensure to secure the route with 'Passthrough' SSL termination.
 
-#### Build & Run
+## Build & Run
 
 ### Running locally
 
