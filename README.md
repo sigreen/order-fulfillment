@@ -64,6 +64,37 @@ The Camel routes used in this example are explained by the following diagram:
 
 1. Once the broker has started, navigate to Services and create a route for the `broker-amq-tcp-ssl` service.  Ensure to secure the route with 'Passthrough' SSL termination.
 
+### Setup AMQ Streams (Kafka) Broker
+
+1. Download and unzip the following file: `https://access.redhat.com/node/3596931/423/1`
+1.  Via the CLI, execute the following command (on MacOS):
+
+	```bash
+	sed -i '' 's/namespace: .*/namespace: order-fulfillment/' install/cluster-operator/*RoleBinding*.yaml
+	```
+1. Deploy the Cluster Operator:
+
+	```bash
+	oc apply -f install/cluster-operator -n order-fulfillment
+	oc apply -f examples/templates/cluster-operator -n order-fulfillment
+	```
+
+1. Deploy the Kafka Cluster:
+
+	```bash
+	oc apply -f examples/kafka/kafka-ephemeral.yaml
+	```
+	
+1. Via the CLI, test the cluster using the sample producer / consumer clients in separate windows, whilst replace the `cluster-name-kakfa-bootstrap` with your corresponding service name:
+
+	```bash
+	oc run kafka-producer -ti --image=registry.access.redhat.com/amqstreams-1/amqstreams10-kafka-openshift:1.0.0 --rm=true --restart=Never -- bin/kafka-console-producer.sh --broker-list cluster-name-kafka-bootstrap:9092 --topic my-topic
+	```
+	
+	```bash
+	oc run kafka-consumer -ti --image=registry.access.redhat.com/amqstreams-1/amqstreams10-kafka-openshift:1.0.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server cluster-name-kafka-bootstrap:9092 --topic my-topic --from-beginning
+	```
+	
 ## Build & Run
 
 ### Running locally
@@ -85,67 +116,20 @@ The Camel routes used in this example are explained by the following diagram:
 	mvn spring-boot:run
 	```
 
-## Running on JBoss Fuse (Karaf Standalone)
-You will need to install this example first:
-  
-> mvn install
+## Running on OpenShift
 
-Install Derby database and JDBC connection pool in Fuse with:
+Once you have your OpenShift environment configured, we can deploy the `order-fulfillment` project using the standard s2i principals..
 
-> osgi:install -s mvn:commons-pool/commons-pool/1.6
+1.  Via the OCP Web Console, navigate to the *Add to Project* drop-down and select **Import YAML / JSON**.
+2.  Copy the contents of `https://raw.githubusercontent.com/sigreen/order-fulfillment/master/support/templates/order-fulfillment.json` to the import window.
+3.  Click **Create** to kick-off the s2i build.
 
-> osgi:install -s mvn:commons-dbcp/commons-dbcp/1.4
+If you would like to deploy using s2i binary streams from your IDE, you can also run the follow commands from the CLI:
 
-> osgi:install -s mvn:org.apache.derby/derby/10.10.1.1
-
-Install into Fuse with:
-
-> features:addurl mvn:org.redhat.examples/transformation-and-cbr/1.0.0-SNAPSHOT/xml/features
-
-> features:install transformation-and-cbr
-
-And you can see the application running by tailing the logs
-
-  log:tail
-
-And you can use ctrl + c to stop tailing the log.
-
-## Running on OpenShift (CDK, Minishift or OpenShift Enterprise)
-Once you have your OpenShift environment running, login as the admin user using oc tools.
-
-Ensure you have the FIS / AMQ image streams installed in the OpenShift namespace.  If not, install them using the following command:
-
-> oc project openshift
-> BASEURL=https://raw.githubusercontent.com/jboss-fuse/application-templates/GA
-> oc replace --force -n openshift -f ${BASEURL}/fis-image-streams.json
-> oc replace --force -n openshift -f https://raw.githubusercontent.com/jboss-openshift/application-templates/master/jboss-image-streams.json
-> BASEURL=https://raw.githubusercontent.com/jboss-openshift/application-templates/master/amq
-> oc replace --force -n openshift -f ${BASEURL}/amq62-basic.json
-
-Next, setup the AMQ 62 basic image in your OpenShift project
-
-> oc new project karaf-amq
-> oc process amq62-basic -v APPLICATION_NAME=broker,MQ_USERNAME=admin,MQ_PASSWORD=admin -n karaf-amq | oc create -f -
-> echo '{"kind": "ServiceAccount", "apiVersion": "v1", "metadata": {"name": "amqsa"}}' | oc create -f -
-> oc policy add-role-to-user view system:serviceaccount:karaf-amq:amqsa
-
-Next, edit the deployment config for the AMQ broker to include the Service Account
-
-> oc edit dc/broker-amq
-
-Add the serviceAccount and serviceAccountName parameters to the spec field, and specify the service account you want to use.
-
-> spec:
->      securityContext: {}
->      serviceAccount: serviceaccount
->      serviceAccountName: amqsa
-
-Update the src/main/resources/amq.properties file and uncomment the following line OpenShift activemq.broker.url property.  Besure to comment the Karaf property that you replace.
-
-Install the example to Openshift using the following commands:
-
-> mvn clean install
-> mvn fabric8:deploy
+	```bash
+	oc project order-fulfillment
+	mvn -Pocp
+	```
 
 ## Testing via the Fuse Management Console
 
@@ -153,8 +137,3 @@ From the Fuse console, select the ActiveMQ tab, and inject sample XML messages (
 
 ![amq-console](src/img/amqTestMessage.png)
 
-Getting Help
-============================
-
-If you hit any problems please let the Fuse team know on the forums
-  [https://community.jboss.org/en/jbossfuse]

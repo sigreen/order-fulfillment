@@ -1,2 +1,7 @@
-/target/
-/.settings/
+RemoteSystemsTempFiles
+.recommenders
+.metadata
+.classpath
+.project
+.settings
+target
