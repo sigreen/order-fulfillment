@@ -2,7 +2,6 @@
   "itemId": 1,
   "itemName": "Hammer",
   "itemDescription": "A large hammer",
-  "itemQty": 1,
-  "unitPrice": 6.99,
-  "totalPrice": 6.99
+  "itemQty": "1",
+  "unitPrice": "6.99"
 }

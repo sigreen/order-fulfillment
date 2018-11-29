@@ -95,6 +95,16 @@ The Camel routes used in this example are explained by the following diagram:
 	oc run kafka-consumer -ti --image=registry.access.redhat.com/amqstreams-1/amqstreams10-kafka-openshift:1.0.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server cluster-name-kafka-bootstrap:9092 --topic my-topic --from-beginning
 	```
 	
+### Setup Consolidated Fuse Console on OpenShift
+
+For management purposes, it can benefical to monitor and manage all running instances of your application.  To do this, follow these steps:
+
+1. Via the OCP console, navigate to the `order-fulfillment` project.
+1. Via the **Add to Project** drop-down, select **Browse Catalog**.
+1. In the Search window search for `Fuse Console`.
+1. Select the Fuse Console template, accept all defaults and create the deployment.
+1. Once the Fuse Console pod has started, click on the link to open the consolidated console.
+
 ## Build & Run
 
 ### Running locally
@@ -130,10 +140,24 @@ If you would like to deploy using s2i binary streams from your IDE, you can also
 	oc project order-fulfillment
 	mvn -Pocp
 	```
+	
+## Building out Fuse Online Routes
 
-## Testing via the Fuse Management Console
+### Scenario One: Hardware Fulfillment
 
-From the Fuse console, select the ActiveMQ tab, and inject sample XML messages (found in src/data) into the payload window:
+Build out an integration that:
 
-![amq-console](src/img/amqTestMessage.png)
+1. Consumes messages for the `hardware.fullfilment` AMQ queue
+1. Enriches the message with a description located in the STOCK database.  The SQL is: `select * from STOCK where item_name = :#itemName`
+1. Transforms the message into a JSON [message](src/main/resources/fulfillment.json)
+1. Sends the generated JSON message to the Order Fulfillment AMQ queue `Outgoing.Fulfillment`.
+
+### Scenario Two: Electrical Fulfillment
+
+Build out an integration that:
+
+1. Consumes messages for the `electrical.fullfilment` AMQ queue
+1. Enriches the message with a description located in the STOCK database.  The SQL is: `select * from STOCK where item_name = :#itemName`
+1. Transforms the message into a JSON [message](src/main/resources/fulfillment.json) and capitalizes the `itemName` field.
+1. Sends the generated JSON message to the Kafka topic `My.Topic`.
 
