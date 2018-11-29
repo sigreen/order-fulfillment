@@ -95,6 +95,12 @@ The Camel routes used in this example are explained by the following diagram:
 	oc run kafka-consumer -ti --image=registry.access.redhat.com/amqstreams-1/amqstreams10-kafka-openshift:1.0.0 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server cluster-name-kafka-bootstrap:9092 --topic my-topic --from-beginning
 	```
 	
+### Install Eclipse Che
+
+1. Via the CLI, create a new project for the deployment: `oc new-project tools1`
+1. From the support/install/ansible directory, execute the following command: `ansible-playbook -i inventory/che.inventory playbooks/openshift/install.yml`
+1. Via the OCP Web Console, monitor the startup of Eclipse Che.  Once the pod starts, click on the route link to open up the IDE
+
 ### Setup Consolidated Fuse Console on OpenShift
 
 For management purposes, it can benefical to monitor and manage all running instances of your application.  To do this, follow these steps:

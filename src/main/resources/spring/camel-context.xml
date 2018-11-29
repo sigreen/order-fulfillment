@@ -26,7 +26,7 @@
     <camelContext id="order-fulfillment" xmlns="http://camel.apache.org/schema/spring">
         <!-- Route to inject test files into JMS -->
         <route id="InjectOrderRequest">
-            <from id="_from1" uri="file:src/data?noop=true"/>
+            <from id="_from1" uri="file:/projects/order-fulfillment/src/data?noop=true"/>
             <to id="_to3" uri="activemq:incoming.order.request"/>
         </route>
         <!-- Process an incoming order request XML record -->

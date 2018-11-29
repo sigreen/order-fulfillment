@@ -1,0 +1,21 @@
+[workshop]
+localhost ansible_connection=local
+[workshop:vars]
+ocp_domain=master.lowes-7031.openshiftworkshop.com
+ocp_apps_domain=apps.lowes-7031.openshiftworkshop.com
+usersno=1
+che=true
+fuse=false
+threescale=false
+apicurio=false
+gogs=false
+microcks=false
+sso=false
+backend=false
+user_projects=false
+user_tools_projects=false
+configure_only=true
+create_tenants=true
+create_realms=false
+create_ides=true
+create_fuses=false
