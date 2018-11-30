@@ -1,8 +1,8 @@
 [workshop]
 localhost ansible_connection=local
 [workshop:vars]
-ocp_domain=master.lowes-7031.openshiftworkshop.com
-ocp_apps_domain=apps.lowes-7031.openshiftworkshop.com
+ocp_domain=master.lowes-36c6.openshiftworkshop.com
+ocp_apps_domain=apps.lowes-36c6.openshiftworkshop.com
 usersno=1
 che=true
 fuse=false

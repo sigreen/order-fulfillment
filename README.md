@@ -22,6 +22,54 @@ The Camel routes used in this example are explained by the following diagram:
 
 1. Via the CLI, create a new project for the deployment: `oc new-project order-fulfillment`
 
+### Import Fuse Image Streams
+
+1. Login via the CLI as the cluster admin
+1. Run the following command to import the image streams:
+
+	```bash
+	BASEURL=https://raw.githubusercontent.com/jboss-fuse/application-templates/application-templates-2.1.fuse-710017-redhat-00006
+	oc create -n openshift -f ${BASEURL}/fis-image-streams.json
+	```
+
+1. Install the quickstart templates
+
+	```bash
+	for template in eap-camel-amq-template.json \
+	 eap-camel-cdi-template.json \
+	 eap-camel-cxf-jaxrs-template.json \
+	 eap-camel-cxf-jaxws-template.json \
+	 eap-camel-jpa-template.json \
+	 karaf-camel-amq-template.json \
+	 karaf-camel-log-template.json \
+	 karaf-camel-rest-sql-template.json \
+	 karaf-cxf-rest-template.json \
+	 spring-boot-camel-amq-template.json \
+	 spring-boot-camel-config-template.json \
+	 spring-boot-camel-drools-template.json \
+	 spring-boot-camel-infinispan-template.json \
+	 spring-boot-camel-rest-sql-template.json \
+	 spring-boot-camel-teiid-template.json \
+	 spring-boot-camel-template.json \
+	 spring-boot-camel-xa-template.json \
+	 spring-boot-camel-xml-template.json \
+	 spring-boot-cxf-jaxrs-template.json \
+	 spring-boot-cxf-jaxws-template.json ;
+	 do
+	 oc create -n openshift -f \
+	 https://raw.githubusercontent.com/jboss-fuse/application-templates/application-templates-2.1.fuse-710017-redhat-00006/quickstarts/${template}
+	 done
+	 ```
+
+1.  Install the Fuse Console into the `openshift` and `order-fulfillment` namespaces:
+
+	```bash
+	oc create -n openshift -f https://raw.githubusercontent.com/jboss-fuse/application-templates/application-templates-2.1.fuse-710017-redhat-00006/fis-console-cluster-template.json
+	oc create -n openshift -f https://raw.githubusercontent.com/jboss-fuse/application-templates/application-templates-2.1.fuse-710017-redhat-00006/fis-console-namespace-template.json
+	oc create -n order-fulfillment -f https://raw.githubusercontent.com/jboss-fuse/application-templates/application-templates-2.1.fuse-710017-redhat-00006/fis-console-cluster-template.json
+	oc create -n order-fulfillment -f https://raw.githubusercontent.com/jboss-fuse/application-templates/application-templates-2.1.fuse-710017-redhat-00006/fis-console-namespace-template.json
+	```
+
 ### Setup Postgres Database
 
 1. Open a browser window and navigate to your OpenShift web console.
@@ -108,7 +156,7 @@ For management purposes, it can benefical to monitor and manage all running inst
 1. Via the OCP console, navigate to the `order-fulfillment` project.
 1. Via the **Add to Project** drop-down, select **Browse Catalog**.
 1. In the Search window search for `Fuse Console`.
-1. Select the Fuse Console template, accept all defaults and create the deployment.
+1. Select the Fuse Console template (the non-clustered one), accept all defaults and create the deployment.
 1. Once the Fuse Console pod has started, click on the link to open the consolidated console.
 
 ## Build & Run
@@ -153,16 +201,16 @@ If you would like to deploy using s2i binary streams from your IDE, you can also
 
 Build out an integration that:
 
-1. Consumes messages for the `hardware.fullfilment` AMQ queue
+1. Consumes messages for the `hardware.fulfillment` AMQ queue
 1. Enriches the message with a description located in the STOCK database.  The SQL is: `select * from STOCK where item_name = :#itemName`
 1. Transforms the message into a JSON [message](src/main/resources/fulfillment.json)
-1. Sends the generated JSON message to the Order Fulfillment AMQ queue `Outgoing.Fulfillment`.
+1. Sends the generated JSON message to the Order Fulfillment AMQ queue `outgoing.fulfillment`.
 
 ### Scenario Two: Electrical Fulfillment
 
 Build out an integration that:
 
-1. Consumes messages for the `electrical.fullfilment` AMQ queue
+1. Consumes messages for the `electrical.fulfillment` AMQ queue
 1. Enriches the message with a description located in the STOCK database.  The SQL is: `select * from STOCK where item_name = :#itemName`
 1. Transforms the message into a JSON [message](src/main/resources/fulfillment.json) and capitalizes the `itemName` field.
 1. Sends the generated JSON message to the Kafka topic `My.Topic`.
